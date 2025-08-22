@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import EmailTemplate from "../../../emails/email-template";
 
@@ -37,18 +36,19 @@ export async function POST(req) {
       ),
     });
 
-    return new NextResponse(JSON.stringify(data), {
+    return new Response(JSON.stringify(data), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "https://havconinfra.com", // 👈 match exactly your domain
+        "Access-Control-Allow-Origin": "https://havconinfra.com", // 👈 your domain
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
       },
     });
   } catch (error) {
     console.error("Resend Error:", error);
-    return new NextResponse(
+
+    return new Response(
       JSON.stringify({ error: "Failed to send email" }),
       {
         status: 500,
@@ -63,12 +63,12 @@ export async function POST(req) {
   }
 }
 
-// ✅ Handle CORS Preflight
+// ✅ Handle CORS preflight request
 export async function OPTIONS() {
-  return new NextResponse(null, {
+  return new Response(null, {
     status: 204, // No Content
     headers: {
-      "Access-Control-Allow-Origin": "https://havconinfra.com", // 👈 must match frontend
+      "Access-Control-Allow-Origin": "https://havconinfra.com", // 👈 your domain
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     },
