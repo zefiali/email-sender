@@ -37,35 +37,40 @@ export async function POST(req) {
       ),
     });
 
-    return NextResponse.json(data, {
+    return new NextResponse(JSON.stringify(data), {
+      status: 200,
       headers: {
-        "Access-Control-Allow-Origin": "https://havconinfra.com", // 👈 allow all (or replace * with your domain)
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "https://havconinfra.com", // 👈 match exactly your domain
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
       },
     });
   } catch (error) {
     console.error("Resend Error:", error);
-    return NextResponse.json(
-      { error: "Failed to send email" },
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to send email" }),
       {
         status: 500,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "https://havconinfra.com",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
         },
       }
     );
   }
 }
 
-// ✅ Handle preflight request
+// ✅ Handle CORS Preflight
 export async function OPTIONS() {
-  return NextResponse.json(
-    {},
-    {
-      headers: {
-        "Access-Control-Allow-Origin": "https://havconinfra.com", // or your domain
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      },
-    }
-  );
+  return new NextResponse(null, {
+    status: 204, // No Content
+    headers: {
+      "Access-Control-Allow-Origin": "https://havconinfra.com", // 👈 must match frontend
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }
