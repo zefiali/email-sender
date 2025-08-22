@@ -4,6 +4,7 @@ import EmailTemplate from "../../../emails/email-template";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// ✅ Handle POST request
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -19,8 +20,8 @@ export async function POST(req) {
     } = body;
 
     const data = await resend.emails.send({
-      from: process.env.FROM_EMAIL, // 👈 use your verified sender
-      to: process.env.TO_EMAIL,  // 👈 your recipient
+      from: process.env.FROM_EMAIL, // verified sender
+      to: process.env.TO_EMAIL,     // recipient
       subject: "New Project Inquiry",
       react: (
         <EmailTemplate
@@ -36,9 +37,35 @@ export async function POST(req) {
       ),
     });
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Access-Control-Allow-Origin": "https://havconinfra.com", // 👈 allow all (or replace * with your domain)
+      },
+    });
   } catch (error) {
     console.error("Resend Error:", error);
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to send email" },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
   }
+}
+
+// ✅ Handle preflight request
+export async function OPTIONS() {
+  return NextResponse.json(
+    {},
+    {
+      headers: {
+        "Access-Control-Allow-Origin": "https://havconinfra.com", // or your domain
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    }
+  );
 }
